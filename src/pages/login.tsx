@@ -1,5 +1,17 @@
+import { gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { FormError } from '../components/form-error';
+
+const LOGIN_MUTATION = gql`
+  mutation PotatoMutation($email: String = "", $password: String = "") {
+    login(input: { email: $email, password: $password }) {
+      ok
+      token
+      error
+    }
+  }
+`;
 
 interface ILoginForm {
   email?: string;
@@ -14,8 +26,13 @@ export const Login = () => {
     handleSubmit,
   } = useForm<ILoginForm>();
 
+  const [loginMutation, { loading, error, data }] = useMutation(LOGIN_MUTATION);
+
   const onSubmit = () => {
-    console.log(getValues());
+    const { email, password } = getValues();
+    loginMutation({
+      variables: { email, password },
+    });
   };
 
   return (
@@ -33,28 +50,22 @@ export const Login = () => {
             className="input"
           />
           {errors.email?.message && (
-            <span className="font-medium text-red-500 text-left">
-              {errors.email.message}
-            </span>
+            <FormError errorMessage={errors.email.message} />
           )}
           <input
             {...register('password', {
               required: 'Password is required',
-              minLength: 10,
+              minLength: 5,
             })}
             type="password"
             placeholder="Password"
             className="input"
           />
           {errors.password?.message && (
-            <span className="text-left ont-medium text-red-500">
-              {errors.password.message}
-            </span>
+            <FormError errorMessage={errors.password.message} />
           )}
           {errors.password?.type === 'minLength' && (
-            <span className="font-medium text-red-500 text-left">
-              Password must be more than 10 chars.
-            </span>
+            <FormError errorMessage="Password must be more than 5 chars." />
           )}
           <button className="btn">Log In</button>
         </form>
