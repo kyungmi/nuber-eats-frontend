@@ -47,6 +47,7 @@ export const Login = () => {
   });
 
   const onSubmit = () => {
+    if (loading) return;
     const { email = '', password = '' } = getValues();
     loginMutation({
       variables: { loginInput: { email, password } },
@@ -85,8 +86,10 @@ export const Login = () => {
           {errors.password?.type === 'minLength' && (
             <FormError errorMessage="Password must be more than 5 chars." />
           )}
-          <button className="btn">Log In</button>
-          {data?.login.error && (
+          <button className="btn" disabled={loading}>
+            {loading ? 'Loading...' : 'Log In'}
+          </button>
+          {loginMutationResult?.login.error && (
             <FormError errorMessage={loginMutationResult.login.error} />
           )}
         </form>

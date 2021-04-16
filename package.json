@@ -24,12 +24,12 @@
     "web-vitals": "^1.1.1"
   },
   "scripts": {
-    "start": "npm run tailwind:build & react-scripts start",
+    "start": "npm run apollo:codegen && npm run tailwind:build & react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "tailwind:build": "tailwind build ./src/styles/tailwind.css -o ./src/styles/styles.css",
-    "apollo:codegen": "npx apollo client:codegen src/__generated__ --target=typescript --outputFlat"
+    "apollo:codegen": "npx rimraf src/__generated__ && npx apollo client:codegen src/__generated__ --target=typescript --outputFlat"
   },
   "eslintConfig": {
     "extends": [
