@@ -1,4 +1,4 @@
-import { gql, useMutation } from '@apollo/client';
+import { ApolloError, gql, useMutation } from '@apollo/client';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { FormError } from '../components/form-error';
@@ -8,8 +8,8 @@ import {
 } from '../__generated__/LoginMutation';
 
 const LOGIN_MUTATION = gql`
-  mutation LoginMutation($email: String = "", $password: String = "") {
-    login(input: { email: $email, password: $password }) {
+  mutation LoginMutation($loginInput: LoginInput!) {
+    login(input: $loginInput) {
       ok
       token
       error
@@ -30,15 +30,26 @@ export const Login = () => {
     handleSubmit,
   } = useForm<ILoginForm>();
 
-  const [loginMutation, { loading, error, data }] = useMutation<
-    LoginMutation,
-    LoginMutationVariables
-  >(LOGIN_MUTATION);
+  const onCompleted = (data: LoginMutation) => {
+    const { ok, token, error } = data.login;
+    if (ok) {
+      console.log(token);
+    }
+  };
+  const onError = (error: ApolloError) => {};
+
+  const [
+    loginMutation,
+    { loading, error, data: loginMutationResult },
+  ] = useMutation<LoginMutation, LoginMutationVariables>(LOGIN_MUTATION, {
+    onCompleted,
+    onError,
+  });
 
   const onSubmit = () => {
-    const { email, password } = getValues();
+    const { email = '', password = '' } = getValues();
     loginMutation({
-      variables: { email, password },
+      variables: { loginInput: { email, password } },
     });
   };
 
@@ -75,6 +86,9 @@ export const Login = () => {
             <FormError errorMessage="Password must be more than 5 chars." />
           )}
           <button className="btn">Log In</button>
+          {data?.login.error && (
+            <FormError errorMessage={loginMutationResult.login.error} />
+          )}
         </form>
       </div>
     </div>
