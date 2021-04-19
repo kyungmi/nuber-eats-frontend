@@ -6,6 +6,9 @@ import {
   LoginMutation,
   LoginMutationVariables,
 } from '../__generated__/LoginMutation';
+import nuberLogo from '../images/logo.svg';
+import { Button } from '../components/button';
+import { Link } from 'react-router-dom';
 
 const LOGIN_MUTATION = gql`
   mutation LoginMutation($loginInput: LoginInput!) {
@@ -26,9 +29,9 @@ export const Login = () => {
   const {
     register,
     getValues,
-    formState: { errors },
+    formState: { errors, isDirty, isValid },
     handleSubmit,
-  } = useForm<ILoginForm>();
+  } = useForm<ILoginForm>({ mode: 'onChange' });
 
   const onCompleted = (data: LoginMutation) => {
     const { ok, token, error } = data.login;
@@ -55,11 +58,17 @@ export const Login = () => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-800">
-      <div className="bg-white w-full max-w-lg py-10 rounded-lg text-center">
-        <h3 className="text-2xl text-gray-800 m-0">Log In</h3>
+    <div className="h-screen flex items-center flex-col mt-10 lg:mt-28">
+      <div className="w-full max-w-screen-sm flex flex-col px-5 items-center">
+        <img src={nuberLogo} className="w-52 mb-16" />
+        <h4 className="w-full font-medium text-left text-3xl mb-8">
+          Welcome back
+        </h4>
+        <p className="w-full font-normal text-left text-sm">
+          Sign in with your email address or mobile number.
+        </p>
         <form
-          className="grid gap-3 my-5 px-5"
+          className="grid gap-3 my-2 w-full"
           onSubmit={handleSubmit(onSubmit)}
         >
           <input
@@ -86,13 +95,22 @@ export const Login = () => {
           {errors.password?.type === 'minLength' && (
             <FormError errorMessage="Password must be more than 5 chars." />
           )}
-          <button className="btn" disabled={loading}>
-            {loading ? 'Loading...' : 'Log In'}
-          </button>
+          <Button
+            actionText="Log In"
+            canClick={isValid}
+            loading={loading}
+            className="mt-3"
+          />
           {loginMutationResult?.login.error && (
             <FormError errorMessage={loginMutationResult.login.error} />
           )}
         </form>
+        <div>
+          New to Nuber?{' '}
+          <Link to="/create-account" className="text-lime-600 hover:underline">
+            Create an Account
+          </Link>
+        </div>
       </div>
     </div>
   );
