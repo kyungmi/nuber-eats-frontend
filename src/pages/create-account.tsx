@@ -5,12 +5,17 @@ import { FormError } from '../components/form-error';
 
 import nuberLogo from '../images/logo.svg';
 import { Button } from '../components/button';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { UserRole } from '../__generated__/globalTypes';
 
+import {
+  CreateAccountMutation,
+  CreateAccountMutationVariables,
+} from '../__generated__/CreateAccountMutation';
+
 const CREATE_ACCOUNT_MUTATION = gql`
-  mutation CreateAccount($createAccountInput: CreateAccountInput!) {
+  mutation CreateAccountMutation($createAccountInput: CreateAccountInput!) {
     createAccount(input: $createAccountInput) {
       ok
       error
@@ -24,7 +29,7 @@ interface ICreateAccountForm {
   role: UserRole;
 }
 
-export const CreateAccount = () => {
+export const CreateAccount = (): JSX.Element => {
   const {
     register,
     getValues,
@@ -37,27 +42,32 @@ export const CreateAccount = () => {
     },
   });
 
-  const onCompleted = (data: any) => {
-    const { ok, token, error } = data.createAccount;
+  const history = useHistory();
+
+  const onCompleted = (data: CreateAccountMutation) => {
+    const { ok, error } = data.createAccount;
     if (ok) {
-      console.log(token);
+      history.push('/login');
     }
   };
   const onError = (error: ApolloError) => {};
 
   const [
     createAccountMutation,
-    { loading, error, data: loginMutationResult },
-  ] = useMutation(CREATE_ACCOUNT_MUTATION, {
-    onCompleted,
-    onError,
-  });
+    { loading, error, data: createAccountMutationResult },
+  ] = useMutation<CreateAccountMutation, CreateAccountMutationVariables>(
+    CREATE_ACCOUNT_MUTATION,
+    {
+      onCompleted,
+      onError,
+    }
+  );
 
   const onSubmit = () => {
     if (loading) return;
-    const { email = '', password = '' } = getValues();
+    const { email = '', password = '', role } = getValues();
     createAccountMutation({
-      variables: { createAccountInput: { email, password } },
+      variables: { createAccountInput: { email, password, role } },
     });
   };
 
@@ -76,13 +86,19 @@ export const CreateAccount = () => {
           onSubmit={handleSubmit(onSubmit)}
         >
           <input
-            {...register('email', { required: 'Email is required' })}
+            {...register('email', {
+              required: 'Email is required',
+              pattern: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@(([[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            })}
             type="email"
             placeholder="Email"
             className="input"
           />
           {errors.email?.message && (
             <FormError errorMessage={errors.email.message} />
+          )}
+          {errors.email?.type === 'pattern' && (
+            <FormError errorMessage={'Please enter a valid email'} />
           )}
           <input
             {...register('password', {
@@ -117,8 +133,10 @@ export const CreateAccount = () => {
             loading={loading}
             className="mt-3"
           />
-          {loginMutationResult?.login.error && (
-            <FormError errorMessage={loginMutationResult.login.error} />
+          {createAccountMutationResult?.createAccount.error && (
+            <FormError
+              errorMessage={createAccountMutationResult.createAccount.error}
+            />
           )}
         </form>
         <div>
