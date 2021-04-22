@@ -6,7 +6,7 @@ import { FormError } from '../components/form-error';
 import nuberLogo from '../images/logo.svg';
 import { Button } from '../components/button';
 import { Link, useHistory } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { UserRole } from '../__generated__/globalTypes';
 
 import {
@@ -47,6 +47,7 @@ export const CreateAccount = (): JSX.Element => {
   const onCompleted = (data: CreateAccountMutation) => {
     const { ok, error } = data.createAccount;
     if (ok) {
+      alert('Account created! Log in now!');
       history.push('/login');
     }
   };
