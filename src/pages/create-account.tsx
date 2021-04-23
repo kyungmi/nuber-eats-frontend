@@ -48,7 +48,7 @@ export const CreateAccount = (): JSX.Element => {
     const { ok, error } = data.createAccount;
     if (ok) {
       alert('Account created! Log in now!');
-      history.push('/login');
+      history.push('/');
     }
   };
   const onError = (error: ApolloError) => {};
@@ -142,7 +142,7 @@ export const CreateAccount = (): JSX.Element => {
         </form>
         <div>
           Already have an account?{' '}
-          <Link to="/login" className="text-lime-600 hover:underline">
+          <Link to="/" className="text-lime-600 hover:underline">
             Log in now
           </Link>
         </div>
