@@ -12,10 +12,14 @@ import { MeQuery } from '../__generated__/MeQuery';
 import { NotFound } from '../pages/404';
 import { Header } from '../components/header';
 import { useMe } from '../hooks/useMe';
+import { ConfirmEmail } from '../pages/user/confirm-email';
 
 const ClientRoutes = [
   <Route path="/" exact key="restaurants-route">
     <Restaurants />
+  </Route>,
+  <Route path="/confirm" exact key="confirm-email-route">
+    <ConfirmEmail />
   </Route>,
 ];
 
