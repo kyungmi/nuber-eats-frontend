@@ -13,6 +13,7 @@ import { NotFound } from '../pages/404';
 import { Header } from '../components/header';
 import { useMe } from '../hooks/useMe';
 import { ConfirmEmail } from '../pages/user/confirm-email';
+import { EditProfile } from '../pages/user/edit-profile';
 
 const ClientRoutes = [
   <Route path="/" exact key="restaurants-route">
@@ -20,6 +21,9 @@ const ClientRoutes = [
   </Route>,
   <Route path="/confirm" exact key="confirm-email-route">
     <ConfirmEmail />
+  </Route>,
+  <Route path="/edit-profile" exact key="edit-profile-route">
+    <EditProfile />
   </Route>,
 ];
 
