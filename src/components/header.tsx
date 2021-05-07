@@ -10,7 +10,7 @@ export const Header: FC = () => {
   return (
     <>
       {!data?.me.verified && (
-        <div className="bg-red-500 p-3 text-center text-sm text-white">
+        <div className="bg-red-500 p-3 text-center text-base text-white">
           <span>Please verify your email.</span>
         </div>
       )}

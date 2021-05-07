@@ -20,21 +20,22 @@ const VERIFY_EMAIL_MUTATION = gql`
 export const ConfirmEmail = () => {
   const client = useApolloClient();
   const history = useHistory();
-  const { data: userData } = useMe();
-  const onCompleted = (data: VerifyEmail) => {
+  const { data: userData, refetch } = useMe();
+  const onCompleted = async (data: VerifyEmail) => {
     const { ok } = data.verifyEmail;
     if (ok && userData?.me.id) {
-      client.writeFragment({
-        id: `User:${userData.me.id}`,
-        fragment: gql`
-          fragment VerifiedUser on User {
-            verified
-          }
-        `,
-        data: {
-          verified: true,
-        },
-      });
+      await refetch();
+      // client.writeFragment({
+      //   id: `User:${userData.me.id}`,
+      //   fragment: gql`
+      //     fragment VerifiedUser on User {
+      //       verified
+      //     }
+      //   `,
+      //   data: {
+      //     verified: true,
+      //   },
+      // });
       history.push('/');
     }
   };
