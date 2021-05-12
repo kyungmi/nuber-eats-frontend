@@ -1,7 +1,8 @@
 import { useQuery } from '@apollo/client';
 import gql from 'graphql-tag';
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { Restaurant } from '../../components/restaurant';
 import {
   RestaurantsPageQuery,
   RestaurantsPageQueryVariables,
@@ -40,16 +41,21 @@ const RESTAURANT_QUERY = gql`
 `;
 
 export const Restaurants: FC = () => {
+  const [page, setPage] = useState(1);
   const { data, loading, error } = useQuery<
     RestaurantsPageQuery,
     RestaurantsPageQueryVariables
   >(RESTAURANT_QUERY, {
     variables: {
       input: {
-        page: 1,
+        page,
       },
     },
   });
+
+  const onNextPageClick = () => setPage((currentPage) => currentPage + 1);
+  const onPrevPageClick = () => setPage((currentPage) => currentPage - 1);
+
   return (
     <div>
       <Helmet>
@@ -80,19 +86,37 @@ export const Restaurants: FC = () => {
               </div>
             ))}
           </div>
-          <div className="grid mt-10 grid-cols-3 gap-x-5 gap-y-10">
+          <div className="grid mt-16 mb-20 grid-cols-3 gap-x-5 gap-y-10">
             {data?.restaurants.results?.map((restaurant) => (
-              <div key={`restaurant-${restaurant.id}`}>
-                <div
-                  className="bg-center py-28 mb-3"
-                  style={{ backgroundImage: `url(${restaurant.coverImage})` }}
-                ></div>
-                <h3 className="text-lg font-medium">{restaurant.name}</h3>
-                <span className="border-t-2 bg-gray-200">
-                  {restaurant.category?.name}
-                </span>
-              </div>
+              <Restaurant
+                id={restaurant.id}
+                coverImage={restaurant.coverImage}
+                name={restaurant.name}
+                categoryName={restaurant.category?.name}
+                key={`restaurant-${restaurant.id}`}
+              />
             ))}
+          </div>
+          <div className="grid grid-cols-3 mt-10 text-center max-w-md items-center mx-auto">
+            <button
+              className="font-medium text-2xl focus:outline-none disabled:opacity-30"
+              onClick={onPrevPageClick}
+              disabled={page <= 1}
+            >
+              &larr;
+            </button>
+
+            <span className="mx-3">
+              Page {page} of {data?.restaurants.totalPages}
+            </span>
+
+            <button
+              className="font-medium text-2xl focus:outline-none disabled:opacity-30"
+              onClick={onNextPageClick}
+              disabled={page === data?.restaurants.totalPages}
+            >
+              &rarr;
+            </button>
           </div>
         </div>
       )}
